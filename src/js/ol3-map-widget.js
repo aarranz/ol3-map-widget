@@ -38,6 +38,11 @@
                 url: "https://cartodb-basemaps-{1-4}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png"
             })
         }),
+        CARTODB_NIGHT: new ol.layer.Tile({
+            source: new ol.source.OSM({
+                url: "https://cartodb-basemaps-{1-4}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png"
+            })
+        }),
         NOKIA_HERE_CARNAV_DAY: new ol.layer.Tile({
             source: new ol.source.XYZ({
                 url: "https://{a-c}.maptile.maps.svc.ovi.com/maptiler/v2/maptile/newest/carnav.day/{z}/{x}/{y}/256/png",
@@ -90,6 +95,44 @@
             source: new ol.source.OSM()
         }),
     };
+    {
+        let projection = ol.proj.get('EPSG:3857');
+        let projectionExtent = projection.getExtent();
+        let size = ol.extent.getWidth(projectionExtent) / 256;
+        let resolutions = new Array(20);
+        let matrixIds = new Array(20);
+        for (let z = 0; z < 20; ++z) {
+            // generate resolutions and matrixIds arrays for this WMTS
+            resolutions[z] = size / Math.pow(2, z);
+            matrixIds[z] = z;
+        }
+        CORE_LAYERS.PNOA = new ol.layer.Tile({
+            extent: projectionExtent,
+            source: new ol.source.WMTS({
+                attributions: 'Teselas de PNOA cedido por © Instituto Geográfico Nacional de España',
+                url: 'http://www.ign.es/wmts/pnoa-ma',
+                layer: 'OI.OrthoimageCoverage',
+                matrixSet: 'GoogleMapsCompatible',
+                format: 'image/jpeg',
+                projection: projection,
+                tileGrid: new ol.tilegrid.WMTS({
+                    origin: ol.extent.getTopLeft(projectionExtent),
+                    resolutions: resolutions,
+                    matrixIds: matrixIds
+                }),
+                style: 'default'
+            })
+        });
+        CORE_LAYERS.OPENGEO = new ol.layer.Tile({
+            source: new ol.source.XYZ({
+                attributions: ['Powered by Esri',
+                    'Source: Esri, DigitalGlobe, GeoEye, Earthstar Geographics, CNES/Airbus DS, USDA, USGS, AeroGRID, IGN, and the GIS User Community'],
+                attributionsCollapsible: false,
+                url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                maxZoom: 23
+            })
+        });
+    }
     CORE_LAYERS.GOOGLE_STANDARD = CORE_LAYERS.MAPQUEST_ROAD;
     CORE_LAYERS.GOOGLE_HYBRID = CORE_LAYERS.MAPQUEST_HYBRID;
     CORE_LAYERS.GOOGLE_SATELLITE = CORE_LAYERS.MAPQUEST_SATELLITE;
@@ -376,20 +419,22 @@
 
     Widget.prototype.init = function init() {
 
-        let layers_button = document.getElementById('button');
-        layers_button.addEventListener('click', (event) => {
-            if (this.layers_widget == null) {
-                this.layers_widget = MashupPlatform.mashup.addWidget(MashupPlatform.prefs.get('layerswidget').trim(), {refposition: event.target.getBoundingClientRect()});
-                this.layers_widget.addEventListener('remove', () => this.layers_widget = null);
-                this.layers_widget.outputs.layerInfoOutput.connect(MashupPlatform.widget.inputs.layerInfo);
-            }
+        let map_button = document.getElementById('map-button');
+        let satellite_button = document.getElementById('satellite-button');
+        map_button.addEventListener('click', (event) => {
+            this.setBaseLayer({id: "OSM"});
+            map_button.classList.add('active');
+            map_button.classList.add('btn-primary');
+            satellite_button.classList.remove('active');
+            satellite_button.classList.remove('btn-primary');
         });
-        let layers_widget_ref = MashupPlatform.prefs.get('layerswidget').trim();
-        if (layers_widget_ref === "") {
-            layers_button.classList.remove('in');
-        } else {
-            layers_button.classList.add('in');
-        }
+        satellite_button.addEventListener('click', (event) => {
+            this.setBaseLayer({id: "PNOA"});
+            map_button.classList.remove('active');
+            map_button.classList.remove('btn-primary');
+            satellite_button.classList.add('active');
+            satellite_button.classList.add('btn-primary');
+        });
 
         // Edit buttons
         const setcenter_button = document.getElementById("setcenter-button");

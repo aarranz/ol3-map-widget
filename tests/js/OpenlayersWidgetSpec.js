@@ -2030,7 +2030,7 @@
 
                 let initial_base_layer = widget.base_layer;
                 widget.setBaseLayer({
-                    id: 'CARTODB_LIGHT'
+                    id: 'WIKIMEDIA'
                 });
 
                 expect(widget.base_layer).not.toBe(initial_base_layer);
