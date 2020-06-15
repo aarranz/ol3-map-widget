@@ -1077,6 +1077,7 @@
         const options = {
             preload: layer_info.preload,
             source: new ol.source.XYZ({
+                attributions: layer_info.attributions,
                 cacheSize: layer_info.cacheSize,
                 wrapX: layer_info.wrapX,
                 url: build_compatible_url(layer_info.url, true),
