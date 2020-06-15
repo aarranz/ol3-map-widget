@@ -299,7 +299,7 @@
         }
 
         this.fa_marker_cache = {};
-    }
+    };
 
     // Build a marker with Font awsome icon
     const build_font_awesome_icon = function build_font_awesome_icon(fontSymbol) {
@@ -386,7 +386,43 @@
 
         this.fa_marker_cache[hash] = canvas;
         return this.fa_marker_cache[hash];
-    }
+    };
+
+    const send_viewport_metadata = function send_viewport_metadata() {
+        if (!MashupPlatform.widget.outputs.metadataOutput.connected) {
+            return;
+        }
+
+        const view = this.map.getView();
+        const extent = view.calculateExtent(this.map.getSize());
+        const resolution = view.getResolution();
+        const availableLayers = [];
+        const visibleLayers = [];
+
+        Object.keys(this.layers).forEach((layer_id) => {
+            const layer = this.layers[layer_id];
+            if (layer.getMinResolution() > resolution || layer.getMaxResolution() < resolution) {
+                return;
+            }
+            const layer_extent = layer.getExtent();
+            if (layer_extent != null && !ol.extent.intersects(extent, layer_extent)) {
+                return;
+            }
+
+            availableLayers.push(layer_id);
+            if (layer.getVisible() && layer.getOpacity() > 0) {
+                visibleLayers.push(layer_id);
+            }
+        });
+        MashupPlatform.widget.outputs.metadataOutput.pushEvent({
+            zoom: view.getZoom(),
+            layers: {
+                available: availableLayers,
+                visible: visibleLayers
+            },
+            extent: extent
+        });
+    };
 
     var send_visible_pois = function send_visible_pois() {
 
@@ -640,6 +676,7 @@
                 this.popover.repaint();
             }
             send_visible_pois.call(this);
+            send_viewport_metadata.call(this);
         });
 
         this.geojsonparser = new ol.format.GeoJSON();

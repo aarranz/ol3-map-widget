@@ -70,6 +70,8 @@
                 break;
             }
         });
+
+        widget.send_viewport_metadata_bound();
     });
 
     MashupPlatform.wiring.registerCallback('poiInput', (poi_info) => {
