@@ -106,11 +106,14 @@
             resolutions[z] = size / Math.pow(2, z);
             matrixIds[z] = z;
         }
+        const cacheurl = MashupPlatform.prefs.get("tilecacheurl");
+        const ignurl = cacheurl !== "" ? cacheurl : "http://www.ign.es";
+        const opengeourl = cacheurl !== "" ? cacheurl : "https://services.arcgisonline.com";
         CORE_LAYERS.PNOA = new ol.layer.Tile({
             extent: projectionExtent,
             source: new ol.source.WMTS({
                 attributions: 'Teselas de PNOA cedido por © Instituto Geográfico Nacional de España',
-                url: 'http://www.ign.es/wmts/pnoa-ma',
+                url: ignurl + '/wmts/pnoa-ma',
                 layer: 'OI.OrthoimageCoverage',
                 matrixSet: 'GoogleMapsCompatible',
                 format: 'image/jpeg',
@@ -128,7 +131,7 @@
                 attributions: ['Powered by Esri',
                     'Source: Esri, DigitalGlobe, GeoEye, Earthstar Geographics, CNES/Airbus DS, USDA, USGS, AeroGRID, IGN, and the GIS User Community'],
                 attributionsCollapsible: false,
-                url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                url: opengeourl + '/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
                 maxZoom: 23
             })
         });

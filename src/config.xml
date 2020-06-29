@@ -26,6 +26,7 @@
         <preference name="poiZoom" label="PoI Zoom" type="text" description="Zoom level applied when centering a PoI" default="17" />
         <preference name="layerswidget" label="Layers Widget" type="text" description="Widget to use for allowing user to switch between layers" default="" />
         <preference name="useclustering" label="Use Clustering" type="boolean" description="Mark this option to use clustering for displaying map features" default="false" />
+        <preference name="tilecacheurl" label="Tile Cache URL" type="text" description="URL of the tile cache server" default="http://172.20.6.88:81" />
     </preferences>
 
     <wiring>
