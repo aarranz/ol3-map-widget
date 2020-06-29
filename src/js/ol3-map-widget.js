@@ -895,6 +895,10 @@
         if ("opacity" in layer_info) {
             layer.setOpacity(layer_info.opacity);
         }
+
+        if ("zIndex" in layer_info) {
+            layer.setZIndex(layer_info.zIndex);
+        }
     };
 
     var build_compatible_url = function build_compatible_url(url, required) {
@@ -925,6 +929,9 @@
         }
         if (typeof layer_info.viewMinZoom === "number") {
             options.maxResolution = this.map.getView().getResolutionForZoom(layer_info.viewMinZoom - 1);
+        }
+        if (typeof layer_info.zIndex === "number") {
+            options.zIndex = layer_info.zIndex;
         }
         return new ol.layer[layer_class](options);
     };
