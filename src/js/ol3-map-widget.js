@@ -244,12 +244,17 @@
             icon.scale = 1;
         }
 
+        if (icon.rotation == null || typeof icon.rotation !== "number") {
+            icon.rotation = 0;
+        }
+
         if (icon.src != null) {
             var image = new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
                 anchor: icon.anchor,
                 anchorXUnits: icon.anchorXUnits,
                 anchorYUnits: icon.anchorYUnits,
                 opacity: icon.opacity,
+                rotation: icon.rotation,
                 src: icon.src,
                 scale: icon.scale
             }));
